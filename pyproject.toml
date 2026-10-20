@@ -20,3 +20,9 @@ ip5 = "ip5.app:main"
 
 [tool.setuptools.dynamic]
 version = {attr = "ip5.__version__"}
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pyinstaller>=6.11",
+]

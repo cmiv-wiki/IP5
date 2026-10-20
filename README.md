@@ -23,23 +23,31 @@ If a recorded parameter changes unit during a recording, the recording continues
 
 ## Installation
 
-Pick one of the options below. All of them install the `ip5` command; run `ip5 --demo` to try it without an IP5.
+Run `ip5 --demo` to try the program without an IP5 (it adds a simulated IP5 to the port list).
 
-### Option 1: conda
+### With uv (recommended)
 
-Requires [Git](https://git-scm.com/downloads) and [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-(or Anaconda). On Windows, run the commands in **Anaconda Prompt** (from the Start menu).
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/):
+
+- macOS/Linux: `curl -LsSf https://astral.sh/uv/install.sh | sh` (or `brew install uv`)
+- Windows (PowerShell): `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+  (or `winget install -e --id astral-sh.uv`)
+
+uv downloads the right Python version (with tkinter) by itself.
+
+To just use the program, install `ip5` as a global command (requires [Git](https://git-scm.com/downloads)):
 
 ```bash
-git clone https://github.com/cmiv-wiki/IP5.git
-cd IP5
-conda env create -f environment.yml
-conda activate ip5
-pip install -e .
+uv tool install git+https://github.com/cmiv-wiki/IP5.git
+uv tool update-shell    # adds ~/.local/bin to PATH; restart the terminal afterwards
 ip5
 ```
 
-### Option 2: pip
+Update later with `uv tool upgrade ip5`.
+
+To work on the code, see [Development](#development).
+
+### With pip
 
 Requires Python 3.10 or later with tkinter:
 - Windows: install from [python.org](https://www.python.org/downloads/windows/) or with
@@ -79,31 +87,13 @@ py -m venv $HOME\ip5-env
 & $HOME\ip5-env\Scripts\ip5.exe
 ```
 
-### Option 3: uv
-
-Requires [uv](https://docs.astral.sh/uv/getting-started/installation/). uv downloads a suitable Python itself.
-
-```bash
-git clone https://github.com/cmiv-wiki/IP5.git
-cd IP5
-uv sync
-uv run ip5
-```
-
-Or install `ip5` as a global command (into `~/.local/bin`, on Windows `C:\Users\<name>\.local\bin`):
-
-```bash
-uv tool install git+https://github.com/cmiv-wiki/IP5.git
-uv tool update-shell    # adds ~/.local/bin to PATH; restart the terminal afterwards
-ip5
-```
-
 ### Where does `ip5` end up?
 
 `ip5` (`ip5.exe` on Windows) is a small launcher in the environment's `bin/` (`Scripts\` on Windows) folder, e.g.
-`.venv/bin/ip5` or `.venv\Scripts\ip5.exe`. If the command is not found, `python -m ip5` always works inside the
-environment. With an editable install (`-e`, `uv sync`), the launcher points to the cloned folder, so code changes
-take effect immediately, but the folder must not be moved or deleted.
+`.venv/bin/ip5` or `.venv\Scripts\ip5.exe`; `uv tool install` puts it in `~/.local/bin`
+(`C:\Users\<name>\.local\bin` on Windows). If the command is not found, `python -m ip5` always works inside the
+environment. With an editable install (`pip install -e`, `uv sync`), the launcher points to the cloned folder, so code
+changes take effect immediately, but the folder must not be moved or deleted.
 
 ### Windows notes
 
@@ -122,29 +112,33 @@ take effect immediately, but the folder must not be moved or deleted.
 
 ## Development
 
+The project uses [uv](https://docs.astral.sh/uv/). The Python version is pinned in `.python-version` and exact
+package versions in `uv.lock`; commit `uv.lock` when dependencies change.
+
 ```bash
-conda env create -f environment.yml
-conda activate ip5
-pip install -e .
-ip5 --demo        # --demo adds a simulated IP5 to the port list
-pytest tests
+git clone https://github.com/cmiv-wiki/IP5.git
+cd IP5
+uv sync             # creates .venv with Python, the package (editable) and dev tools (pytest, pyinstaller)
+uv run ip5 --demo
+uv run pytest tests
 ```
 
-With uv: `uv run --with pytest pytest tests`. With pip: `pip install pytest` in the venv first.
+- Add a dependency: `uv add <package>` (or `uv add --dev <package>` for dev tools).
+- Update locked versions: `uv lock --upgrade`.
+- With pip instead: `pip install -e . pytest pyinstaller` in a venv (see [With pip](#with-pip)).
 
 ## Building the app
 
 ```bash
-conda activate ip5
 ./build_app.sh
 ```
 
-- macOS: `dist/IP5 Recorder.app`
-- Windows: run `pyinstaller --noconfirm --clean ip5.spec` in Anaconda Prompt → `dist\IP5 Recorder\IP5 Recorder.exe`
-- Linux: `./build_app.sh` → `dist/IP5 Recorder/IP5 Recorder`
+The script uses `uv run pyinstaller` if uv is installed, otherwise `pyinstaller` from the active environment.
 
-Without conda: `pip install pyinstaller` in the venv and run the same commands, or with uv:
-`uv run --with pyinstaller pyinstaller --noconfirm --clean ip5.spec`.
+- macOS: `dist/IP5 Recorder.app`
+- Linux: `dist/IP5 Recorder/IP5 Recorder`
+- Windows: run `uv run pyinstaller --noconfirm --clean ip5.spec` in PowerShell (or `./build_app.sh` in Git Bash)
+  → `dist\IP5 Recorder\IP5 Recorder.exe`
 
 On Windows and Linux the app is a folder; copy the whole `IP5 Recorder` folder, not just the executable.
 
