@@ -1,29 +1,29 @@
 # IP5 Recorder
 
-Program för att läsa ut och spela in data från en Philips IntelliVue Expression IP5 (MR400) via serieporten.
+Program for reading and recording data from a Philips IntelliVue Expression IP5 (MR400) over its serial port.
 
-- Välj serieport och anslut
-- Välj vilka parametrar som ska övervakas och spelas in (klicka i tabellen)
-- Monitorfönster med realtidsgrafer (tidsfönster 1–120 min)
-- Starta/stoppa inspelning, data sparas som TSV
+- Select a serial port and connect
+- Choose which parameters to monitor and record (click in the table)
+- Monitor window with real-time plots (time window 1–120 min)
+- Start/stop recording, data is saved as TSV
 
-## Inspelningsfiler
+## Recording files
 
-Filerna hamnar i vald mapp som `<prefix>_YYYYMMDD_HHMMSS.tsv`. En rad skrivs per post från IP5:an (ungefär 1 Hz)
-och filen skrivs till disk efter varje rad, så inget går förlorat om programmet kraschar.
+Files are saved in the selected folder as `<prefix>_YYYYMMDD_HHMMSS.tsv`. One row is written per record from the IP5
+(about 1 Hz), and the file is flushed to disk after every row, so nothing is lost if the program crashes.
 
-| Kolumn | Innehåll |
+| Column | Contents |
 |---|---|
-| `Time (s)` | Sekunder sedan inspelningens första rad (enligt IP5:ans klocka) |
-| `Device time` | Tidsstämpel från IP5:an |
-| `PC time` | När datorn tog emot posten |
-| `<Parameter> (<enhet>)` | Värde, tomt om det saknas (`?` från enheten eller ej skickat, t.ex. NIBP mellan mätningar) |
+| `Time (s)` | Seconds since the first row of the recording (according to the IP5's clock) |
+| `Device time` | Timestamp from the IP5 |
+| `PC time` | When the computer received the record |
+| `<Parameter> (<unit>)` | Value, empty if missing (`?` from the device or not sent, e.g. NIBP between measurements) |
 
-Byter en inspelad parameter enhet under inspelningen fortsätter inspelningen i en ny fil (`…_part2.tsv`) med nya rubriker.
+If a recorded parameter changes unit during a recording, the recording continues in a new file (`…_part2.tsv`) with new headers.
 
 ## Installation
 
-Kräver [Git](https://git-scm.com/downloads) och [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (eller Anaconda).
+Requires [Git](https://git-scm.com/downloads) and [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (or Anaconda).
 
 ```bash
 git clone https://github.com/cmiv-wiki/IP5.git
@@ -31,36 +31,36 @@ cd IP5
 conda env create -f environment.yml
 conda activate ip5
 pip install -e .
-ip5               # eller: ip5 --demo för att testa utan IP5
+ip5               # or: ip5 --demo to try it without an IP5
 ```
 
 ### Windows
 
-- Kör kommandona ovan i **Anaconda Prompt** (från Start-menyn).
-- En USB–seriell-adapter behöver oftast en drivrutin (t.ex. FTDI eller Prolific). Porten syns sedan som `COM3` e.d.
-  i Enhetshanteraren och i programmets portlista.
+- Run the commands above in **Anaconda Prompt** (from the Start menu).
+- A USB-to-serial adapter usually needs a driver (e.g. FTDI or Prolific). The port then shows up as `COM3` or similar
+  in Device Manager and in the program's port list.
 
 ### Linux
 
-- Serieporten heter `/dev/ttyUSB0` (USB–seriell-adapter) eller `/dev/ttyS0`.
-- Användaren måste ha behörighet till serieporten. Lägg till dig i gruppen `dialout` (Debian/Ubuntu)
-  eller `uucp` (Arch) och logga ut/in:
+- The serial port is `/dev/ttyUSB0` (USB-to-serial adapter) or `/dev/ttyS0`.
+- Your user needs permission to access the serial port. Add yourself to the `dialout` group (Debian/Ubuntu)
+  or `uucp` (Arch), then log out and back in:
   ```bash
   sudo usermod -aG dialout $USER
   ```
-- "Visa i mapp" använder `xdg-open`, som finns på de flesta skrivbordsmiljöer.
+- "Show in folder" uses `xdg-open`, which is available on most desktop environments.
 
-## Utveckling
+## Development
 
 ```bash
 conda env create -f environment.yml
 conda activate ip5
 pip install -e .
-ip5 --demo        # --demo lägger till en simulerad IP5 i portlistan
+ip5 --demo        # --demo adds a simulated IP5 to the port list
 pytest tests
 ```
 
-## Bygga appen
+## Building the app
 
 ```bash
 conda activate ip5
@@ -68,15 +68,15 @@ conda activate ip5
 ```
 
 - macOS: `dist/IP5 Recorder.app`
-- Windows: kör `pyinstaller --noconfirm --clean ip5.spec` i Anaconda Prompt → `dist\IP5 Recorder\IP5 Recorder.exe`
+- Windows: run `pyinstaller --noconfirm --clean ip5.spec` in Anaconda Prompt → `dist\IP5 Recorder\IP5 Recorder.exe`
 - Linux: `./build_app.sh` → `dist/IP5 Recorder/IP5 Recorder`
 
-På Windows och Linux är appen en mapp; kopiera hela mappen `IP5 Recorder`, inte bara den körbara filen.
+On Windows and Linux the app is a folder; copy the whole `IP5 Recorder` folder, not just the executable.
 
-PyInstaller korskompilerar inte; appen måste byggas på det operativsystem den ska köras på.
-Appen är inte signerad:
-- macOS: första gången, högerklicka → Öppna.
-- Windows: om SmartScreen varnar, klicka "Mer information" → "Kör ändå".
+PyInstaller does not cross-compile; the app must be built on the operating system it will run on.
+The app is not signed:
+- macOS: the first time, right-click → Open.
+- Windows: if SmartScreen warns, click "More info" → "Run anyway".
 
-Inställningar (senaste port, mapp, valda parametrar) sparas i `~/.ip5/settings.json`
-(Windows: `C:\Users\<namn>\.ip5\settings.json`). Inspelningar hamnar som standard i `~/Documents/IP5 recordings`.
+Settings (last port, folder, selected parameters) are saved in `~/.ip5/settings.json`
+(Windows: `C:\Users\<name>\.ip5\settings.json`). Recordings are saved to `~/Documents/IP5 recordings` by default.
