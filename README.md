@@ -26,7 +26,7 @@ Byter en inspelad parameter enhet under inspelningen fortsätter inspelningen i 
 Kräver [Git](https://git-scm.com/downloads) och [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (eller Anaconda).
 
 ```bash
-git clone https://github.com/gurraburra/IP5.git
+git clone https://github.com/cmiv-wiki/IP5.git
 cd IP5
 conda env create -f environment.yml
 conda activate ip5
