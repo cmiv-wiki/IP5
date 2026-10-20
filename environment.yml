@@ -1,0 +1,11 @@
+name: ip5
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - matplotlib=3.9
+  - numpy=2.1
+  - pip
+  - pip:
+    - pyserial==3.5
+    - pyinstaller==6.11.1

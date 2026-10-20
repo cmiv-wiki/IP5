@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools >= 64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ip5"
+authors = [
+    {name = "Gustav Magnusson", email = "gustav.magnusson@liu.se"},
+]
+description = "Record data from a Philips Expression IP5 over its serial port"
+requires-python = ">=3.10"
+dependencies = [
+    "matplotlib",
+    "pyserial",
+]
+dynamic = ["version"]
+
+[project.scripts]
+ip5 = "ip5.app:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "ip5.__version__"}
