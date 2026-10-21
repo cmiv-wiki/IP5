@@ -23,9 +23,20 @@ If a recorded parameter changes unit during a recording, the recording continues
 
 ## Installation
 
-Run `ip5 --demo` to try the program without an IP5 (it adds a simulated IP5 to the port list).
+There are two ways to run the program:
 
-### With uv (recommended)
+1. **[Run the `ip5` command](#option-1-run-the-ip5-command)**: install the Python package and start the program from
+   a terminal with `ip5`. Easiest to keep up to date; requires Python (uv can install it for you).
+2. **[Build a standalone app](#option-2-build-a-standalone-app)**: build `IP5 Recorder.app` (macOS) or
+   `IP5 Recorder.exe` (Windows) once, then start it like any other program. The finished app does not need Python, so
+   it can be copied to a computer without it (with the same operating system).
+
+Both run the same program; settings and recordings are shared (see [Settings and recordings](#settings-and-recordings)).
+Use `ip5 --demo` (or `uv run ip5 --demo` in a clone) to try it without an IP5; it adds a simulated IP5 to the port list.
+
+### Option 1: Run the `ip5` command
+
+#### With uv (recommended)
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
@@ -35,7 +46,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
 uv downloads the right Python version (with tkinter) by itself.
 
-To just use the program, install `ip5` as a global command (requires [Git](https://git-scm.com/downloads)):
+Install `ip5` as a global command (requires [Git](https://git-scm.com/downloads)):
 
 ```bash
 uv tool install git+https://github.com/cmiv-wiki/IP5.git
@@ -47,7 +58,7 @@ Update later with `uv tool upgrade ip5`.
 
 To work on the code, see [Development](#development).
 
-### With pip
+#### With pip
 
 Requires Python 3.10 or later with tkinter:
 - Windows: install from [python.org](https://www.python.org/downloads/windows/) or with
@@ -87,13 +98,50 @@ py -m venv $HOME\ip5-env
 & $HOME\ip5-env\Scripts\ip5.exe
 ```
 
-### Where does `ip5` end up?
+#### Where does `ip5` end up?
 
 `ip5` (`ip5.exe` on Windows) is a small launcher in the environment's `bin/` (`Scripts\` on Windows) folder, e.g.
 `.venv/bin/ip5` or `.venv\Scripts\ip5.exe`; `uv tool install` puts it in `~/.local/bin`
 (`C:\Users\<name>\.local\bin` on Windows). If the command is not found, `python -m ip5` always works inside the
 environment. With an editable install (`pip install -e`, `uv sync`), the launcher points to the cloned folder, so code
 changes take effect immediately, but the folder must not be moved or deleted.
+
+### Option 2: Build a standalone app
+
+The app is built with [PyInstaller](https://pyinstaller.org/) from a clone of the repository. Install
+[uv](#with-uv-recommended) first (or use a pip environment with `pip install -e . pyinstaller`).
+
+macOS/Linux:
+
+```bash
+git clone https://github.com/cmiv-wiki/IP5.git
+cd IP5
+./build_app.sh
+```
+
+Windows (PowerShell):
+
+```powershell
+git clone https://github.com/cmiv-wiki/IP5.git
+cd IP5
+uv run pyinstaller --noconfirm --clean ip5.spec    # or ./build_app.sh in Git Bash
+```
+
+`build_app.sh` uses `uv run pyinstaller` if uv is installed, otherwise `pyinstaller` from the active environment.
+The result ends up in `dist/`:
+
+- macOS: `dist/IP5 Recorder.app` (drag it to Applications if you like)
+- Linux: `dist/IP5 Recorder/IP5 Recorder`
+- Windows: `dist\IP5 Recorder\IP5 Recorder.exe`
+
+On Windows and Linux the app is a folder; copy the whole `IP5 Recorder` folder, not just the executable.
+
+PyInstaller does not cross-compile; the app must be built on the operating system it will run on.
+To update the app, `git pull` and build again.
+
+The app is not signed:
+- macOS: the first time, right-click → Open.
+- Windows: if SmartScreen warns, click "More info" → "Run anyway".
 
 ### Windows notes
 
@@ -109,6 +157,11 @@ changes take effect immediately, but the folder must not be moved or deleted.
   sudo usermod -aG dialout $USER
   ```
 - "Show in folder" uses `xdg-open`, which is available on most desktop environments.
+
+## Settings and recordings
+
+Settings (last port, folder, selected parameters) are saved in `~/.ip5/settings.json`
+(Windows: `C:\Users\<name>\.ip5\settings.json`). Recordings are saved to `~/Documents/IP5 recordings` by default.
 
 ## Development
 
@@ -126,26 +179,3 @@ uv run pytest tests
 - Add a dependency: `uv add <package>` (or `uv add --dev <package>` for dev tools).
 - Update locked versions: `uv lock --upgrade`.
 - With pip instead: `pip install -e . pytest pyinstaller` in a venv (see [With pip](#with-pip)).
-
-## Building the app
-
-```bash
-./build_app.sh
-```
-
-The script uses `uv run pyinstaller` if uv is installed, otherwise `pyinstaller` from the active environment.
-
-- macOS: `dist/IP5 Recorder.app`
-- Linux: `dist/IP5 Recorder/IP5 Recorder`
-- Windows: run `uv run pyinstaller --noconfirm --clean ip5.spec` in PowerShell (or `./build_app.sh` in Git Bash)
-  → `dist\IP5 Recorder\IP5 Recorder.exe`
-
-On Windows and Linux the app is a folder; copy the whole `IP5 Recorder` folder, not just the executable.
-
-PyInstaller does not cross-compile; the app must be built on the operating system it will run on.
-The app is not signed:
-- macOS: the first time, right-click → Open.
-- Windows: if SmartScreen warns, click "More info" → "Run anyway".
-
-Settings (last port, folder, selected parameters) are saved in `~/.ip5/settings.json`
-(Windows: `C:\Users\<name>\.ip5\settings.json`). Recordings are saved to `~/Documents/IP5 recordings` by default.
