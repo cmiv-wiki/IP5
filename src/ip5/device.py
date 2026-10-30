@@ -66,7 +66,7 @@ def parseRecord(line, pc_time=None):
 
 
 def listSerialPorts():
-    return sorted(p.device for p in serial.tools.list_ports.comports())
+    return sorted(f"{p.device} ({p.description})" for p in serial.tools.list_ports.comports())
 
 
 class DeviceReader(threading.Thread):
